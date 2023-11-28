@@ -51,8 +51,10 @@ def remove_program(server, program_name):
             print(f'Программа {program_name} успешно удалена.')
     except paramiko.AuthenticationException:
         print('Ошибка аутентификации. Проверьте правильность имени пользователя и пароля.')
+        raise
     except paramiko.SSHException as e:
         print(f'Ошибка подключения к серверу: {str(e)}')
+        raise
     finally:
         # Закрываем SSH-соединение
         ssh_client.close()
