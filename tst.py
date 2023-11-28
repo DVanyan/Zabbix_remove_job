@@ -16,7 +16,7 @@ def connect_to_server(server):
             return username, password
     return None, None
 
-def remove_program(server, username, password, program_name):
+def remove_program(server, program_name):
     try:
         username, password = connect_to_server(server)
         
@@ -57,9 +57,9 @@ def remove_program(server, username, password, program_name):
         # Закрываем SSH-соединение
         ssh_client.close()
 
-def remove_programs_from_servers(servers, username, password, program_name):
+def remove_programs_from_servers(servers, program_name):
     for server in servers:
-        remove_program(server, username, password, program_name)
+        remove_program(server, program_name)
         
 # Получаем список серверов из переменной окружения
 servers_str = os.getenv('SERVERS')
@@ -68,4 +68,4 @@ servers_str = os.getenv('SERVERS')
 servers = servers_str.split(', ')
 
 # Запуск удаления приложения на нескольких серверах
-remove_programs_from_servers(servers, 'username', 'password', 'zabbix-agent')
+remove_programs_from_servers(servers, 'zabbix-agent')
