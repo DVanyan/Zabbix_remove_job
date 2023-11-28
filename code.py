@@ -1,6 +1,7 @@
 #Функция для удаления с сервера Linux
 import platform
 import subprocess
+import paramiko
 
 def remove_zabbix_agent():
     # Получаем информацию о типе операционной системы
