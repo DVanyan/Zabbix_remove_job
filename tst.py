@@ -10,15 +10,15 @@ def connect_to_server(server):
         password = os.getenv(f'PASSWORD_{credential_id}')
 
         # Попытка подключения к серверу
-        success = try_to_connect(server_name, username, password)
+        success = try_to_connect(server, username, password)
 
         if success:
-            return username, password, server
+            return username, password
     return None, None
 
 def remove_program(server, username, password, program_name):
     try:
-        username
+        username, password = connect_to_server(server)
         
         # Создаем SSH-клиент
         ssh_client = paramiko.SSHClient()
