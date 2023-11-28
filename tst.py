@@ -1,7 +1,9 @@
 import paramiko
 import os
 
-def connect_to_server(server_name):
+credential_ids = [ansible_user, jenkins_user]
+
+def connect_to_server(server):
     for credential_id in credential_ids:
         # Получение логина и пароля
         username = os.getenv(f'USERNAME_{credential_id}')
@@ -11,17 +13,19 @@ def connect_to_server(server_name):
         success = try_to_connect(server_name, username, password)
 
         if success:
-            return username, password
+            return username, password, server
     return None, None
 
-def remove_program(server_ip, username, password, program_name):
+def remove_program(server, username, password, program_name):
     try:
+        username
+        
         # Создаем SSH-клиент
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         # Подключаемся к серверу
-        ssh_client.connect(server_ip, username=username, password=password)
+        ssh_client.connect(server, username=username, password=password)
 
         # Определяем команду для удаления программы в зависимости от операционной системы
         _, stdout, _ = ssh_client.exec_command('uname')
