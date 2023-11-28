@@ -1,7 +1,18 @@
 import paramiko
 import os
 
-credential_ids = [ansible_user, jenkins_user]
+credential_ids = ['ansible_svc', 'jenkins_svc-digi.loc']
+
+def try_to_connect(server, username, password):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    try:
+        ssh.connect(server, username=username, password=password)
+        return True
+    except paramiko.AuthenticationException:
+        return False
+    finally:
+        ssh.close()
 
 def connect_to_server(server):
     for credential_id in credential_ids:
@@ -64,7 +75,7 @@ def remove_programs_from_servers(servers, program_name):
         remove_program(server, program_name)
         
 # Получаем список серверов из переменной окружения
-servers_str = os.getenv('SERVERS')
+servers_str = os.getenv('Servers')
 
 # Преобразуем строку в список
 servers = servers_str.split(', ')
