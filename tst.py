@@ -56,7 +56,12 @@ def remove_program(server_ip, username, password, program_name):
 def remove_programs_from_servers(servers, username, password, program_name):
     for server in servers:
         remove_program(server, username, password, program_name)
+        
+# Получаем список серверов из переменной окружения
+servers_str = os.getenv('SERVERS')
+
+# Преобразуем строку в список
+servers = servers_str.split(', ')
 
 # Запуск удаления приложения на нескольких серверах
-servers = ['192.168.1.100', '192.168.1.101', '192.168.1.102']
 remove_programs_from_servers(servers, 'username', 'password', 'zabbix-agent')
