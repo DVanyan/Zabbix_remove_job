@@ -2,37 +2,41 @@ import paramiko
 import os
 
 os_type = "none"
-credential_ids = ['ansible_svc', 'jenkins_svc-digi.loc']
 
-def try_to_connect(server, credential_ids):
+def try_to_connect(server):
+    server = server + '.digi.loc'
+    print(server)
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     
-    for credential_id in credential_ids:
-        # Получение логина и пароля
-        username = os.getenv(f'USERNAME_{credential_id}')
-        password = os.getenv(f'PASSWORD_{credential_id}')
+    # Получение логина и пароля
+    username = os.getenv('jenkins_user')
+    password = os.getenv('jenkins_pass')
 
-        try:
-            ssh.connect(server, username=username, password=password)
-            return 'Linux'
-        except paramiko.AuthenticationException:
-            continue  # Если подключение не удалось, переходим к следующему набору учетных данных
-        finally:
-            ssh.close()
-    return 'Windows'  # Если ни одно подключение не удалось, возвращаем 'Windows'
+    try:
+        ssh.connect(server, username=username, password=password)
+        
+        # Выполнение команды uname -a
+        stdin, stdout, stderr = ssh.exec_command("uname -a")
+        output = stdout.read().decode()
+        linux_type = output.split()  # Чтение вывода команды
+                
+        return linux_type  # Возвращаем тип Linux
+    except Exception as e:  # Обрабатываем все исключения
+        return str(e)  
+    finally:
+        ssh.close()
 
 
 # Получаем список серверов из переменной окружения
 servers_str = os.getenv('Servers')
 
 # Преобразуем строку в список
-for i in servers_str:
-    if len(servers_str) == 1:
-        servers = servers_str
-    else:
-        servers = servers_str.split(', ')
+servers = servers_str.split(', ')
 
-def remove_programs_from_servers(servers, program_name):
-    for server in servers:
-        connect_to_server(server)
+os_types = []
+for server in servers:
+    os_type = try_to_connect(server)
+    os_types.append(os_type)
+        
+print(os_type)
