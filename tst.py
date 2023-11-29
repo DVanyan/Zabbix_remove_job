@@ -27,48 +27,7 @@ def connect_to_server(server):
             return username, password
     return None, None
 
-def remove_program(server, program_name):
-    try:
-        username, password = connect_to_server(server)
-        
-        # Создаем SSH-клиент
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        # Подключаемся к серверу
-        ssh_client.connect(server, username=username, password=password)
-
-        # Определяем команду для удаления программы в зависимости от операционной системы
-        _, stdout, _ = ssh_client.exec_command('uname')
-        os_type = stdout.read().decode().strip()
-
-        if os_type == 'Linux':
-            command = f'sudo apt-get remove {program_name}'  # Пример команды для Ubuntu/Debian
-        elif os_type == 'Linux':
-            command = f'sudo yum remove {program_name}'
-        elif os_type == 'Windows':
-            command = f'wmic product where "name=\'{program_name}\'" call uninstall'  # Команда для удаления программы на Windows
-        else:
-            print('Данная операционная система не поддерживается.')
-            return
-
-        # Выполняем команду для удаления программы
-        _, stdout, stderr = ssh_client.exec_command(command)
-        output = stdout.read().decode().strip()
-
-        if output:
-            print(f'Результат выполнения команды: {output}')
-        else:
-            print(f'Программа {program_name} успешно удалена.')
-    except paramiko.AuthenticationException:
-        print('Ошибка аутентификации. Проверьте правильность имени пользователя и пароля.')
-        raise
-    except paramiko.SSHException as e:
-        print(f'Ошибка подключения к серверу: {str(e)}')
-        raise
-    finally:
-        # Закрываем SSH-соединение
-        ssh_client.close()
 
 def remove_programs_from_servers(servers, program_name):
     for server in servers:
